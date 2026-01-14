@@ -10,41 +10,93 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 func main() {
 
-	inputData := bufio.NewReader(os.Stdin)
-	fmt.Println("New book record: ")
-	input, err := inputData.ReadString('\n')
+	new_book := readBookFromStdin()
 
-	if err != nil {
-		log.Fatal(err)
+	if err := saveBook(new_book, "lib.json"); err != nil {
+		log.Fatalf("Failed to save book: %v", err)
 	}
 
-	fileName := "lib.json"
-	writer, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY, 0644)
+	fmt.Println("\nBook record added:")
+}
+
+func readBookFromStdin() *book {
+	reader := bufio.NewReader(os.Stdin)
+
+	b := &book{}
+
+	fmt.Print("Name: ")
+	b.name = readLine(reader)
+
+	fmt.Print("Author: ")
+	b.author = readLine(reader)
+
+	fmt.Print("ISBN: ")
+	b.isbn = readLine(reader)
+
+	fmt.Print("Edition: ")
+	b.edition = readLine(reader)
+
+	fmt.Print("Language: ")
+	b.language = readLine(reader)
+
+	fmt.Print("Review (optional): ")
+	b.review = readLine(reader)
+
+	fmt.Print("Rating (0-10): ")
+	ratingStr := readLine(reader)
+	if ratingStr != "" {
+		fmt.Sscanf(ratingStr, "%f", &b.rating)
+	}
+
+	fmt.Print("Start Date (DD-MM-YYYY): ")
+	b.startDate = readLine(reader)
+
+	fmt.Print("End Date (DD-MM-YYYY): ")
+	b.endDate = readLine(reader)
+
+	fmt.Print("Days Read (DD-MM-YYYY): ")
+	b.daysRead = []string{}
+
+	return b
+}
+
+func readLine(reader *bufio.Reader) string {
+	line, _ := reader.ReadString('\n')
+
+	return strings.TrimSpace(line)
+}
+
+func saveBook(book *book, fileName string) error {
+
+	fmt.Println(book.String())
+	jsonData, err := json.Marshal(book)
 
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to marshal book: %w", err)
 	}
-	defer writer.Close()
 
-	_, err = writer.WriteString(input)
+	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to open file: %w", err)
 	}
 
-	// Read contents of the file
-	data, err := os.ReadFile(fileName)
+	defer file.Close()
+
+	_, err = file.WriteString(string(jsonData) + "\n")
+
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to write to file: %w", err)
 	}
-	fmt.Println("File Contents:", string(data))
 
-	b := book{"the stand", "stephen king", "9780385121682", "1", "en-us", "", 9.5, "1-1-2026", "30-1-2026", []string{"1-1-2026", "2-1-2026"}}
-	fmt.Println(b.String())
+	return nil
 }
