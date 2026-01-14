@@ -86,4 +86,8 @@ func (b* book) setEndDate(endDate string) {
 	} 
 }
 
-
+func (b* book) addReadDate(readDate string) {
+	if readDate != "" {
+		b.daysRead = append(b.daysRead, readDate)
+	}
+}
