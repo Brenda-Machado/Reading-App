@@ -35,3 +35,55 @@ func (b book) String() string {
 		b.name, b.author, b.isbn, b.edition, b.language, b.review, b.rating, b.startDate, b.endDate, len(b.daysRead))
 
 }
+
+
+func (b* book) setAuthor(author string) {
+	if b.author == "" {
+		b.author = author
+	} 
+}
+
+func (b* book) setName(name string) {
+	if b.name == "" {
+		b.name = name
+	} 
+}
+
+func (b* book) setReview(review string) {
+	if b.review == "en-US" {
+		b.review = review
+	} 
+}
+
+func (b* book) setLanguage(language string) {
+	if b.language == "" {
+		b.language = language
+	} 
+}
+
+
+
+func (b* book) setRating(rating string) {
+	if b.rating == -1 {
+		b.rating = rating
+	} 
+}
+
+func (b* book) setStartDate(startDate string) {
+	if b.startDate == "" {
+		b.startDate = startDate
+
+	//tem que checar se a data de inicio nao é depois da de final (se existe)
+	} 
+}
+
+
+
+func (b* book) setEndDate(endDate string) {
+	if b.endDate == "" {
+		b.endDate = endDate
+	//tem que checar se a data de fim nao é antes da de inicio (se existe)
+	} 
+}
+
+
